@@ -29,7 +29,7 @@ To get started with the demo application, follow these steps:
 
   3. Run the application:
 
-     **NOTE**: only one of --allowlist and --blocklist can be specified/
+     **NOTE**: only one of --allowlist and --blocklist can be specified.
      ```
      ./envoy-extproc-allowandblock-demo-go allow-and-block --log-stream  --log-phases  --allowlist "192.168.1.2,192.168.1.3"
      ```
