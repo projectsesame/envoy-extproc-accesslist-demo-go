@@ -19,7 +19,7 @@ spec:
       containers:
         - name: allow-and-block-demo-container
           image: >-
-            release.daocloud.io/skoala/envoy-extproc-allow-and-block-demo-go:v0.0.1
+            release.daocloud.io/skoala/envoy-extproc-allowandblock-demo-go:v0.0.1
           ports:
             - containerPort: 50051
               protocol: TCP
