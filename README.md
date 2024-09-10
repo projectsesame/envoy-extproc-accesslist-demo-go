@@ -1,6 +1,6 @@
-# envoy-extproc-payloadlimit-demo-go
+# envoy-extproc-allowandblock-demo-go
 
-This repository contains a demo application written in Go that demonstrates the usage of Envoy's External Processor (ExtProc) filter to do `payload limit` for POST request.
+This repository contains a demo application written in Go that demonstrates the usage of Envoy's External Processor (ExtProc) filter to do `allow and block ip address(es)` for HTTP request.
 
 ## Overview
 
@@ -19,7 +19,7 @@ To get started with the demo application, follow these steps:
 
   1. Clone the repository:
      ```
-     git clone https://github.com/projectsesame/envoy-extproc-payloadlimit-demo-go.git
+     git clone https://github.com/projectsesame/envoy-extproc-allowandblock-demo-go.git
      ```
 
   2. Build the Go application:
@@ -28,8 +28,14 @@ To get started with the demo application, follow these steps:
      ```
 
   3. Run the application:
+
+     **NOTE**: only one of --allowlist and --blocklist can be specified/
      ```
-     ./envoy-extproc-payloadlimit-demo-go payload-limit --log-stream --log-phases payload-limit 32
+     ./envoy-extproc-allowandblock-demo-go allow-and-block --log-stream  --log-phases  --allowlist "192.168.1.2,192.168.1.3"
+     ```
+     OR
+     ```
+     ./envoy-extproc-allowandblock-demo-go allow-and-block --log-stream  --log-phases  --blocklist "192.168.1.2,192.168.1.3"
      ```
 
 

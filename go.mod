@@ -1,4 +1,4 @@
-module github.com/projectsesame/envoy-extproc-payloadlimit-demo-go
+module github.com/projectsesame/envoy-extproc-allowandblock-demo-go
 
 go 1.21
 
