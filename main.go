@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,17 +10,25 @@ import (
 )
 
 type processor interface {
-	Init(opts *ep.ProcessingOptions, nonFlagArgs []string) error
+	Init(opts *ep.ProcessingOptions, cmdArgs []string) error
 	Finish()
 
 	ep.RequestProcessor
 }
 
 var processors = map[string]processor{
-	"payload-limit": &payloadLimitRequestProcessor{},
+	"allow-and-block": &allowAndBlockRequestProcessor{},
 }
 
-func parseArgs(args []string) (port *int, opts *ep.ProcessingOptions, nonFlagArgs []string) {
+const (
+	kAllowList = "allowlist"
+	kBlockList = "blocklist"
+	flagPrefix = "--"
+
+	errMsg = "only one of --allowlist and --blocklist can be specified"
+)
+
+func parseArgs(args []string) (port *int, opts *ep.ProcessingOptions, remainArgs []string) {
 	rootCmd := flag.NewFlagSet("root", flag.ExitOnError)
 	port = rootCmd.Int("port", 50051, "the gRPC port.")
 
@@ -30,8 +39,29 @@ func parseArgs(args []string) (port *int, opts *ep.ProcessingOptions, nonFlagArg
 	rootCmd.BoolVar(&opts.UpdateExtProcHeader, "update-extproc-header", false, "update the extProc header or not.")
 	rootCmd.BoolVar(&opts.UpdateDurationHeader, "update-duration-header", false, "update the duration header or not.")
 
+	cnt := 0
+
+	paramChecker := func() error {
+		cnt++
+		if cnt >= 2 {
+			return fmt.Errorf(errMsg)
+		}
+		return nil
+
+	}
+	// put back for later use
+	rootCmd.Func(kAllowList, fmt.Sprintf("the white ip list (%s)", errMsg), func(s string) error {
+		remainArgs = append(remainArgs, flagPrefix+kAllowList, s)
+		return paramChecker()
+	})
+	rootCmd.Func(kBlockList, fmt.Sprintf("the black ip list (%s)", errMsg), func(s string) error {
+		remainArgs = append(remainArgs, flagPrefix+kBlockList, s)
+		return paramChecker()
+	})
+
 	rootCmd.Parse(args)
-	nonFlagArgs = rootCmd.Args()
+
+	remainArgs = append(remainArgs, rootCmd.Args()...)
 	return
 }
 
@@ -49,8 +79,8 @@ func main() {
 		log.Fatalf("Processor \"%s\" not defined.", cmd)
 	}
 
-	port, opts, nonFlagArgs := parseArgs(os.Args[2:])
-	if err := proc.Init(opts, nonFlagArgs); err != nil {
+	port, opts, cmdArgs := parseArgs(os.Args[2:])
+	if err := proc.Init(opts, cmdArgs); err != nil {
 		log.Fatalf("Initialize the processor is failed: %v.", err.Error())
 	}
 	defer proc.Finish()
